@@ -29,7 +29,8 @@
 
 <body>
     <div ng-app="myApp" ng-controller="myCtrl" style="margin-left:10%;margin-right:10%;margin-top:50px;width:80%" >
-        </div ng-show="allServey">
+        <div ng-show="allServey && !ShowResult">
+            <h2>Serveys:</h2>
             <table  style="width:100%">
                 <tr ng-repeat="servey in serveyList" style="border: 2px solid black;" height=50px width=1000px ng-click="OpenServey(servey)">
                     <td>
@@ -39,8 +40,39 @@
                     </td>
                 </tr>
             </table>
-        <div>
-
+        </div>
+        <div ng-show="!allServey && !ShowResult">
+            <h3>Title:</h3>
+            <h1>{{openServeyRes.Title}}</h1 ><br>
+            <h3>Description:</h3>
+            <p>{{openServeyRes.Description}}</p>
+            <h3>Questions:</h3>
+            <table  style="width:100%">
+                    <tr ng-repeat="os in openServeyRes.Question"  height=50px width=1000px >
+                        <td>
+                            <center>
+                                <p><b>{{os.Que}}</b></p>
+                                <form>
+                                    <div ng-repeat="option in os.Options">
+                                        {{option}}
+                                    </div>
+                                    <input type="text" placeholder="Answer" ng-attr-id="{{os.id}}">
+                                </form>
+                            </center>
+                        </td>
+                    </tr>
+            </table>
+            <center><button type="button" value="Submit" ng-click="SubmitResponse(openServeyRes.Question)" style="width:65px; height:25px">Submit</button></center>
+        </div>
+        <div ng-show="ShowResult">
+            <div ng-repeat="res in Response">
+                <h3>Title:{{res.Title}}</h3>
+                <div ng-repeat="q in res.Question">
+                        <h4>Question:{{q.que}}</h4>
+                        <h4>Answer:{{q.answer}}</h4>
+                </div>
+            </div>
+        </div>            
     </div>
 </body>
 
@@ -49,6 +81,7 @@
     var app = angular.module('myApp', ['ui.bootstrap']);
     app.controller('myCtrl', function($scope, $http, $timeout, $interval, $q) {
         $scope.allServey = true
+        $scope.myVar=""
         $scope.service_url = "http://localhost:3000/api/v1/";
         $http(
                 {
@@ -77,14 +110,55 @@
             ).then(
                 function(response) {
                     console.log(response.data)
-                    $scope.serveyList = response.data.responseData
+                    $scope.openServeyRes = response.data.responseData
+                    for(var i=0;i<$scope.openServeyRes.Question.length;i++)
+                    {
+                        $scope.openServeyRes.Question[i]["id"]="que"+i;
+                    }
                 },
                 function(response) {
                     alert(response.data.message)
                 }     
             ) 
         }
+        $scope.SubmitResponse=function(questions){
+            
+            var req={}
+            req["title"]=$scope.openServeyRes.title;
+            req["question"]=[];
+            for(var i=0;i<$scope.openServeyRes.Question.length;i++){
+                var temp={};
+                temp["que"]=questions[i].Que;
+                var anscomp=document.getElementById($scope.openServeyRes.Question[i].id)
+                console.log(anscomp)
+                var ans = anscomp.value
+                if(ans=null)
+                    ans=""
+                temp["answer"]=ans;
+                req["question"].push(temp);
+            }
+            $http(
+                {
+                    url: $scope.service_url + "takeservey/",
+                    method: 'POST',
+                    data: req,
+                    headers:{
+                        "token":localStorage.getItem("token")
+                    }
+                }
+            ).then(
+                function(response) {
+                    alert("submitted successfully");
+                    $scope.ShowResult=true
+                    $scope.allServey=false
+                },
+                function(response) {
+                    alert(response.data.message)
+                }     
+            )    
+        }
     })
+
 </script>
 
 </html>
