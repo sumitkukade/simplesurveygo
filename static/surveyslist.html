@@ -29,15 +29,17 @@
 
 <body>
     <div ng-app="myApp" ng-controller="myCtrl" style="margin-left:10%;margin-right:10%;margin-top:50px;width:80%" >
-
-        <h1 style="text-align:center;font-size:450%;font-family:'Times New Roman'" >Survey Service</h1>
-        <br>
-        <br>
-
-        <h1 style="text-align:center;font-size:250%;font-family:'Times New Roman'" >Survey list</h1>
-        
-
-                
+        </div ng-show="allServey">
+            <table  style="width:100%">
+                <tr ng-repeat="servey in serveyList" style="border: 2px solid black;" height=50px width=1000px ng-click="OpenServey(servey)">
+                    <td>
+                        <center>
+                            <p><b>{{servey.Title}}</b></p>
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        <div>
 
     </div>
 </body>
@@ -46,9 +48,42 @@
 <script>
     var app = angular.module('myApp', ['ui.bootstrap']);
     app.controller('myCtrl', function($scope, $http, $timeout, $interval, $q) {
+        $scope.allServey = true
         $scope.service_url = "http://localhost:3000/api/v1/";
-
-
+        $http(
+                {
+                    url: $scope.service_url + "servey/?status=active",
+                    method: "GET",
+                    param:{
+                        "status":"active"
+                    }
+                }
+            ).then(
+                function(response) {
+                    console.log(response.data)
+                    $scope.serveyList = response.data.responseData
+                },
+                function(response) {
+                    alert(response.data.message)
+                }     
+            ) 
+        $scope.OpenServey = function(servey){
+            $scope.allServey = false
+            $http(
+                {
+                    url: $scope.service_url + "servey/?title="+servey.Title,
+                    method: "GET",
+                }
+            ).then(
+                function(response) {
+                    console.log(response.data)
+                    $scope.serveyList = response.data.responseData
+                },
+                function(response) {
+                    alert(response.data.message)
+                }     
+            ) 
+        }
     })
 </script>
 
