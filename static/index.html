@@ -63,7 +63,25 @@
             </div>
 
             <div id="register" class="tab-pane fade">                
-
+                <div style="width:80%;margin:auto">
+                    <br>
+                    <br>
+                    <div class="form-group">
+                        <label for="usr">UserName:</label>
+                        <input type="text" class="form-control" id="usr" ng-model="sign_username">
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Password:</label>
+                        <input type="password" class="form-control" id="pwd" ng-model="sign_password">
+                    </div>
+                    <div class="form-group">
+                        <label for="alias">Alias:</label>
+                        <input type="text" class="form-control" id="ali" ng-model="sign_alias">
+                    </div>
+                    <button type="button" ng-click="signup()" class="btn btn-block btn-primary">
+                        SignUP
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -91,7 +109,10 @@
                 }
             ).then(
                 function(response) {
-                    localStorage.token = response.data.responseData.token
+                    console.log(response.data.responseData)
+                    localStorage.setItem("token",response.data.responseData.token)
+                    localStorage.setItem("userName",response.data.responseData.username)
+
                     window.location.href = "http://localhost:3000/surveyslist.html";
                 },
                 function(response) {
@@ -100,6 +121,29 @@
             ) 
         } 
 
+
+        $scope.signup = function() {
+            $http(
+                {
+                    url: $scope.service_url + "signup/",
+                    method: 'POST',
+                    data: {
+                        username: $scope.sign_username,
+                        password: $scope.sign_password,
+                        alias: $scope.sign_alias
+                    }
+                }
+            ).then(
+                function(response) {
+                    localStorage.token = response.data.responseData.token
+                    alert("User Added Successfully")
+                    window.location.href = "http://localhost:3000/";
+                },
+                function(response) {
+                    alert(response.data.message)
+                }     
+            ) 
+        } 
 
     })
 </script>
