@@ -16,7 +16,7 @@ type Session struct {
 	Token    string `json:"token"`
 }
 
-func AuthenticateUser(cred UserCredentials) string {
+func AuthenticateUser(cred UserCredentials) Session {
 	session := MgoSession.Clone()
 	defer session.Close()
 
@@ -28,12 +28,12 @@ func AuthenticateUser(cred UserCredentials) string {
 	uuidStr := uuid.Must(uuid.NewV4()).String()
 	sessionStruct := Session{cred.Username, uuidStr}
 	if err != nil {
-		return ""
+		return Session{}
 	}
 
 	sessionClctn := session.DB("simplesurveys").C("session")
 	sessionClctn.Insert(sessionStruct)
-	return uuidStr
+	return sessionStruct
 }
 
 func GetSessionDetails(token string) UserCredentials {
@@ -53,4 +53,25 @@ func GetSessionDetails(token string) UserCredentials {
 	query = clctn.Find(bson.M{"username": response.Username})
 	err = query.One(&cred)
 	return cred
+}
+
+func SignupUser(cred UserCredentials) string {
+	session := MgoSession.Clone()
+	defer session.Close()
+
+	clctn := session.DB("simplesurveys").C("user")
+
+	var signup UserCredentials
+	query := clctn.Find(bson.M{"username": cred.Username})
+	err := query.One(&signup)
+	if signup.Username != "" {
+		return "User Already Present"
+	}
+
+	err = clctn.Insert(&cred)
+	if err != nil {
+		panic(err)
+	}
+	return "User Registered"
+
 }

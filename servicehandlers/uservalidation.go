@@ -32,12 +32,12 @@ func (p UserValidationHandler) Post(r *http.Request) SrvcRes {
 	var cred dao.UserCredentials
 	err = json.Unmarshal(body, &cred)
 
-	token := dao.AuthenticateUser(cred)
+	session := dao.AuthenticateUser(cred)
 
-	if token == "" {
+	if session.Token == "" {
 		return UnauthorizedAccess("Bad username or password")
 	} else {
-		return Response200OK(token)
+		return Response200OK(session)
 	}
 
 }
