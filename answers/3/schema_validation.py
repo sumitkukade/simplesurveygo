@@ -5,7 +5,23 @@ from jsonschema import validate
 
 def validate_json(data):
     given_json = json.dumps(data["json-data"])
-    schema = { "type": "object", "required": [], "properties": { "color": { "type": "string" }, "category": { "type": "string" }, "type": { "type": "string" }, "code": { "type": "object", "required": [], "properties": { "rgba": { "type": "array", "items": { "type": "number" } }, "hex": { "type": "string" } } } } }
+    schema = { 
+        "type": "object", 
+        "required": [], 
+        "properties": { "colors": { "type": "array", 
+        "items": { "type": "object", 
+                   "required": [], 
+                   "properties": { "color": { "type": "string" }, 
+                   "category": { "type": "string" }, 
+                   "type": { "type": "string" }, 
+                   "code": { "type": "object", 
+                   "required": [], 
+                   "properties": { "rgba": { "type": "array", 
+                   "items": { "type": "number" } }, 
+                   "hex": { "type": "string" }
+                   }}}}}
+                }
+            }
     try:
         validate(given_json,schema)
     except Exception as e:
