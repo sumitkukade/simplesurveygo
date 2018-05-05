@@ -1,0 +1,4 @@
+A Resource base class can define the routing for one or more HTTP methods for a given URL.
+Eg. to define a User resource with GET, PUT and DELETE methods which will be needed during web application development for getting and sending data to the server.
+
+dispatch_request in class works 

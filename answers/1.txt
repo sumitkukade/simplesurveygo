@@ -1,0 +1,6 @@
+REST is highly scalable and maintainable to make an web app,
+for me rest is a thinking that will teach us to write easy to understand and maintanable REST servicies,
+it makes APIs easy to use and understand
+
+unlike regular services it is very helpfull to scale an app and easy to understand..
+regular services are not scalable.
